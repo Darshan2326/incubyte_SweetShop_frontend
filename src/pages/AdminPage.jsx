@@ -187,7 +187,7 @@ const AdminPage = () => {
                 // Find the existing sweet to preserve quantity if not returned in response
                 const existingSweet = sweets.find(s => s._id === editingSweetId);
                 const existingQuantity = existingSweet ? existingSweet.quantity : 0;
-                
+
                 const formattedSweet = {
                     _id: updatedSweet._id || editingSweetId,
                     name: updatedSweet.name || newSweet.name,

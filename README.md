@@ -19,10 +19,11 @@ in frontend i use react and i don't have enough experience in react i am flutter
 
 
 ### what i learn 
-- i realy enjoy this assesment and i learn about the react now atleast i am capable to create basic react projec
-- i learn Vercel and Render deployement with Github and gain my CICD skill
-- i learn the new errors that i didn't heread yet during the deployement  
-
+- i realy enjoy this assesment and i learn about the react now atleast i am capable to create basic react project.
+- i learn Vercel and Render deployement with Github and gain my CICD skill.
+- i learn the new errors that i didn't heread yet during the deployement.
+- i realise my abiloty and productivity by this assesment
+-  
 
 
 
@@ -62,7 +63,7 @@ in frontend i use react and i don't have enough experience in react i am flutter
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Darshan2326/incubyte_SweetShop_frontend.git
    ```
 
 2. Navigate to the project directory:
