@@ -150,6 +150,7 @@ The frontend communicates with a backend API hosted at `https://incubyte-sweetsh
 
 1. Users log in with email and password
 2. Upon successful authentication, users are redirected based on their role:
+   - if you register as a xyz@admin.com then only you get the admin privileges. 
    - Administrators are redirected to `/admin`
    - Regular users are redirected to `/`
 3. Authentication tokens are stored in localStorage for persistent sessions
