@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Homepage = () => {
+    const navigate = useNavigate();
     const [sweets, setSweets] = useState([]);
     const [allSweets, setAllSweets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -68,7 +70,7 @@ const Homepage = () => {
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        window.location.href = "/";
+        navigate("/");
     };
 
     const handlePurchaseQuantityChange = (sweetId, value) => {

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { loginUser, registerUser } from "../API/auth";
 
 const AuthPage = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
     name: "",
@@ -39,14 +41,14 @@ const AuthPage = () => {
         localStorage.setItem("user", JSON.stringify(response.user));
         setMessage(`✅ ${response.message}`);
 
-        // Redirect based on user role
+        // Redirect based on user role using React Router
         if (isLogin) {
           if (response.user.role === "admin") {
             // Redirect to admin page
-            window.location.href = "/admin";
+            navigate("/admin");
           } else {
             // Redirect to homepage for regular users
-            window.location.href = "/";
+            navigate("/homepage");
           }
         }
       } else {

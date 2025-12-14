@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdminPage = () => {
+    const navigate = useNavigate();
     const [sweets, setSweets] = useState([]);
     const [allSweets, setAllSweets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -281,6 +283,12 @@ const AdminPage = () => {
         setShowAddForm(true);
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/");
+    };
+
     // Calculate statistics
     const totalSweets = sweets.length;
     const totalStock = sweets.reduce((acc, sweet) => acc + (sweet.quantity || 0), 0);
@@ -412,11 +420,7 @@ const AdminPage = () => {
                         </div>
                         <button
                             style={styles.logoutButton}
-                            onClick={() => {
-                                localStorage.removeItem("token");
-                                localStorage.removeItem("userRole");
-                                window.location.href = "/";
-                            }}
+                            onClick={handleLogout}
                         >
                             🚪 Logout
                         </button>
