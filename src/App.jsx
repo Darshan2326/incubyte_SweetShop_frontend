@@ -1,49 +1,44 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 import AuthPage from "./components/auth";
 import Homepage from "./pages/Homepage";
 import AdminPage from "./pages/AdminPage";
 
 const App = () => {
-  // Check if user is logged in and their role
-  const getUserRole = () => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      try {
-        const userData = JSON.parse(user);
-        return userData.role;
-      } catch (e) {
-        return null;
+  const { isAuthenticated, userRole } = useAuth();
+
+  // Custom component for the root route that handles redirects
+  const RootRoute = () => {
+    // If already authenticated, redirect based on role
+    if (isAuthenticated && userRole) {
+      if (userRole === "admin") {
+        return <Navigate to="/admin" />;
+      } else {
+        return <Navigate to="/homepage" />;
       }
     }
-    return null;
-  };
 
-  const isAuthenticated = () => {
-    return !!localStorage.getItem("token");
+    // Otherwise show the auth page
+    return <AuthPage />;
   };
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<AuthPage />} />
-        <Route path="/login" element={<AuthPage />} />
+        <Route path="/" element={<RootRoute />} />
 
         {/* Protected routes */}
         <Route
           path="/homepage"
           element={
-            isAuthenticated() && getUserRole() !== "admin" ?
-              <Homepage /> :
-              <Navigate to="/" />
+            isAuthenticated && userRole && userRole !== "admin" ? <Homepage /> : <Navigate to="/" />
           }
         />
         <Route
           path="/admin"
           element={
-            isAuthenticated() && getUserRole() === "admin" ?
-              <AdminPage /> :
-              <Navigate to="/" />
+            isAuthenticated && userRole === "admin" ? <AdminPage /> : <Navigate to="/" />
           }
         />
 

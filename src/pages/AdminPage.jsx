@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const AdminPage = () => {
     const navigate = useNavigate();
+    const { isAuthenticated, userRole, logout } = useAuth();
     const [sweets, setSweets] = useState([]);
     const [allSweets, setAllSweets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -23,7 +25,25 @@ const AdminPage = () => {
         quantity: ""
     });
 
+    // Check authentication status
     useEffect(() => {
+        if (!isAuthenticated) {
+            // Not authenticated, redirect to login
+            navigate("/");
+            return;
+        }
+
+        // If user is not admin, redirect to homepage
+        if (userRole !== "admin") {
+            navigate("/homepage");
+            return;
+        }
+    }, [isAuthenticated, userRole, navigate]);
+
+    // Fetch sweets only when authenticated
+    useEffect(() => {
+        if (!isAuthenticated || userRole !== "admin") return;
+
         const fetchSweets = async () => {
             try {
                 const response = await fetch("https://incubyte-sweetshop-backend.onrender.com/api/sweets");
@@ -41,7 +61,7 @@ const AdminPage = () => {
         };
 
         fetchSweets();
-    }, []);
+    }, [isAuthenticated, userRole]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -284,8 +304,7 @@ const AdminPage = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        logout();
         navigate("/");
     };
 

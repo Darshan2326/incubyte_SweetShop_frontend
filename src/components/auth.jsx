@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { loginUser, registerUser } from "../API/auth";
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const { login, isAuthenticated, userRole } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
     name: "",
@@ -14,8 +16,35 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState("");
 
+  // Check if user is already logged in
+  useEffect(() => {
+    if (isAuthenticated && userRole) {
+      // Redirect based on user role
+      if (userRole === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/homepage");
+      }
+    }
+  }, [isAuthenticated, userRole, navigate]);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    // Reset form state
+    setIsLogin(true);
+    setForm({
+      name: "",
+      email: "",
+      password: "",
+    });
+    setMessage("");
+    // Force a re-render by updating state
+    setFocusedInput("");
   };
 
   const handleSubmit = async (e) => {
@@ -37,17 +66,15 @@ const AuthPage = () => {
       setLoading(false);
 
       if (response.token) {
-        localStorage.setItem("token", response.token);
-        localStorage.setItem("user", JSON.stringify(response.user));
+        // Use the context login function which will update the auth state immediately
+        login(response.token, response.user);
         setMessage(`✅ ${response.message}`);
 
         // Redirect based on user role using React Router
         if (isLogin) {
           if (response.user.role === "admin") {
-            // Redirect to admin page
             navigate("/admin");
           } else {
-            // Redirect to homepage for regular users
             navigate("/homepage");
           }
         }

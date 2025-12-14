@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Homepage = () => {
     const navigate = useNavigate();
+    const { isAuthenticated, userRole, logout } = useAuth();
     const [sweets, setSweets] = useState([]);
     const [allSweets, setAllSweets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [userRole, setUserRole] = useState(null);
     const [userName, setUserName] = useState("");
     const [purchaseQuantities, setPurchaseQuantities] = useState({});
     const [activeCategory, setActiveCategory] = useState("all");
@@ -16,17 +17,35 @@ const Homepage = () => {
     const [showCart, setShowCart] = useState(false);
     const [purchaseSuccess, setPurchaseSuccess] = useState(null);
 
+    // Check authentication status
     useEffect(() => {
+        if (!isAuthenticated) {
+            // Not authenticated, redirect to login
+            navigate("/");
+            return;
+        }
+
+        // If user is admin, redirect to admin page
+        if (userRole === "admin") {
+            navigate("/admin");
+            return;
+        }
+
+        // Set user name
         const user = localStorage.getItem("user");
         if (user) {
             try {
                 const userData = JSON.parse(user);
-                setUserRole(userData.role);
                 setUserName(userData.name || "Sweet Lover");
             } catch (e) {
                 console.error("Error parsing user data:", e);
             }
         }
+    }, [isAuthenticated, userRole, navigate]);
+
+    // Fetch sweets only when authenticated
+    useEffect(() => {
+        if (!isAuthenticated || userRole === "admin") return;
 
         const fetchSweets = async () => {
             try {
@@ -45,7 +64,7 @@ const Homepage = () => {
         };
 
         fetchSweets();
-    }, []);
+    }, [isAuthenticated, userRole]);
 
     // Filter sweets based on category and search
     useEffect(() => {
@@ -68,8 +87,7 @@ const Homepage = () => {
     }, [activeCategory, searchTerm, allSweets]);
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        logout();
         navigate("/");
     };
 
