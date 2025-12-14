@@ -21,35 +21,46 @@ const AuthPage = () => {
     setLoading(true);
     setMessage("");
 
-    let response;
-    if (isLogin) {
-      response = await loginUser({
-        email: form.email,
-        password: form.password,
-      });
-    } else {
-      response = await registerUser(form);
-    }
-
-    setLoading(false);
-
-    if (response.token) {
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
-      setMessage(`✅ ${response.message}`);
-
-      // Redirect based on user role
+    try {
+      let response;
       if (isLogin) {
-        if (response.user.role === "admin") {
-          // Redirect to admin page
-          window.location.href = "/admin";
-        } else {
-          // Redirect to homepage for regular users
-          window.location.href = "/homepage";
-        }
+        response = await loginUser({
+          email: form.email,
+          password: form.password,
+        });
+      } else {
+        response = await registerUser(form);
       }
-    } else {
-      setMessage("❌ Something went wrong");
+
+      setLoading(false);
+
+      if (response.token) {
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.user));
+        setMessage(`✅ ${response.message}`);
+
+        // Redirect based on user role
+        if (isLogin) {
+          if (response.user.role === "admin") {
+            // Redirect to admin page
+            window.location.href = "/admin";
+          } else {
+            // Redirect to homepage for regular users
+            window.location.href = "/";
+          }
+        }
+      } else {
+        setMessage("❌ Something went wrong");
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Authentication error:", error);
+      // Check if it's a CORS or network error
+      if (error.name === 'TypeError' || error.message.includes('fetch') || error.message.includes('CORS')) {
+        setMessage("❌ Network error. Please check your connection or try again later.");
+      } else {
+        setMessage(`❌ ${error.message || "Something went wrong"}`);
+      }
     }
   };
 

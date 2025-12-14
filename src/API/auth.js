@@ -1,21 +1,43 @@
-const BASE_URL = "https://incubyte-sweetshop-backend.onrender.com/api/auth";
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'https://incubyte-sweetshop-backend.onrender.com'}/api/auth`;
 
 export async function loginUser(data) {
-    const res = await fetch(`${BASE_URL}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-    });
+    try {
+        const res = await fetch(`${BASE_URL}/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
 
-    return res.json();
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error("Login API error:", error);
+        throw error;
+    }
 }
 
 export async function registerUser(data) {
-    const res = await fetch(`${BASE_URL}/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-    });
+    try {
+        const res = await fetch(`${BASE_URL}/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
 
-    return res.json();
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error("Register API error:", error);
+        throw error;
+    }
 }

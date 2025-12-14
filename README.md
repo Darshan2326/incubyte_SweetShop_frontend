@@ -53,6 +53,22 @@ A modern React-based web application for managing and browsing a sweet shop inve
    yarn install
    ```
 
+## Environment Variables
+
+The application uses environment variables to configure the API base URL:
+
+- `VITE_API_BASE_URL`: The base URL for API requests
+
+For local development, create a `.env.development` file with:
+```
+VITE_API_BASE_URL=http://localhost:5173
+```
+
+For production deployment, create a `.env.production` file with:
+```
+VITE_API_BASE_URL=https://incubyte-sweetshop-backend.onrender.com
+```
+
 ## Development
 
 To start the development server:
@@ -110,7 +126,7 @@ The frontend communicates with a backend API hosted at `https://incubyte-sweetsh
 1. Users log in with email and password
 2. Upon successful authentication, users are redirected based on their role:
    - Administrators are redirected to `/admin`
-   - Regular users are redirected to `/homepage`
+   - Regular users are redirected to `/`
 3. Authentication tokens are stored in localStorage for persistent sessions
 4. All API requests include the authentication token in the Authorization header
 
