@@ -1,6 +1,30 @@
-# Sweetshop Frontend
+### Work Overview
 
-A modern React-based web application for managing and browsing a sweet shop inventory. The application features role-based access control, allowing administrators to manage products while regular users can browse and purchase sweets.
+- first i start with the normal coding impliment and testing in local but after that i deploy my frontend into vercel and start working in CICD with vercel.
+- in github history you can check evry push and evry comment about the work
+
+
+### AI Usage Policy (Important)
+
+in frontend i use react and i don't have enough experience in react i am flutter developer with more then 8 month experince so for react i used some AI , the list of open sorce usege are below
+
+- used chatGPT for learn how to attech the APIs in react 
+- used https://reactbits.dev/ website for UI components
+- once i complete the UI i give it to lmarena.ai AI to convert the into modern UI
+- i took the refrenc of https://ant.design/ and https://primereact.org/ website for design 
+- for solveing the errors in deployement i take help of qoder AI and copilot AI
+
+- **AI Co-authorship** :- ChatGPT , Lmarena.AI , qoder , copilot.
+- **Websites** :- reactbits.dev , ant.design , primereact.org
+
+
+### what i learn 
+- i realy enjoy this assesment and i learn about the react now atleast i am capable to create basic react projec
+- i learn Vercel and Render deployement with Github and gain my CICD skill
+- i learn the new errors that i didn't heread yet during the deployement  
+
+
+
 
 ## Features
 
