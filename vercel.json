@@ -1,43 +1,43 @@
 {
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
+    "headers": [
         {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "true"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "https://incubyte-sweetshop-backend.onrender.com"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Access-Control-Allow-Credentials",
+                    "value": "true"
+                },
+                {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "https://incubyte-sweetshop-backend.onrender.com"
+                },
+                {
+                    "key": "Access-Control-Allow-Methods",
+                    "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+                },
+                {
+                    "key": "Access-Control-Allow-Headers",
+                    "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+                }
+            ]
         }
-      ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://incubyte-sweetshop-backend.onrender.com/api/$1"
-    },
-    {
-      "source": "/update/(.*)",
-      "destination": "https://incubyte-sweetshop-backend.onrender.com/update/$1"
-    },
-    {
-      "source": "/delete/(.*)",
-      "destination": "https://incubyte-sweetshop-backend.onrender.com/delete/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+    ],
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "https://incubyte-sweetshop-backend.onrender.com/api/$1"
+        },
+        {
+            "source": "/update/(.*)",
+            "destination": "https://incubyte-sweetshop-backend.onrender.com/update/$1"
+        },
+        {
+            "source": "/delete/(.*)",
+            "destination": "https://incubyte-sweetshop-backend.onrender.com/delete/$1"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
 }

@@ -184,12 +184,16 @@ const AdminPage = () => {
 
             const updatedSweet = await response.json();
             if (updatedSweet && typeof updatedSweet === 'object') {
+                // Find the existing sweet to preserve quantity if not returned in response
+                const existingSweet = sweets.find(s => s._id === editingSweetId);
+                const existingQuantity = existingSweet ? existingSweet.quantity : 0;
+                
                 const formattedSweet = {
                     _id: updatedSweet._id || editingSweetId,
                     name: updatedSweet.name || newSweet.name,
                     category: updatedSweet.category || newSweet.category,
                     price: (typeof updatedSweet.price === 'number') ? updatedSweet.price : parseFloat(newSweet.price) || 0,
-                    quantity: (typeof updatedSweet.quantity === 'number') ? updatedSweet.quantity : 0,
+                    quantity: (typeof updatedSweet.quantity === 'number') ? updatedSweet.quantity : existingQuantity,
                     last_action: updatedSweet.last_action || null,
                     history: updatedSweet.history || [],
                     createdAt: updatedSweet.createdAt || new Date().toISOString(),
@@ -257,13 +261,23 @@ const AdminPage = () => {
             if (response.ok || response.status === 200) {
                 const updatedSweet = await response.json();
 
-                // Update the sweet in state
-                setSweets(prev => prev.map(sweet =>
-                    sweet._id === id ? { ...sweet, quantity: updatedSweet.quantity } : sweet
-                ));
-                setAllSweets(prev => prev.map(sweet =>
-                    sweet._id === id ? { ...sweet, quantity: updatedSweet.quantity } : sweet
-                ));
+                // Update the sweet in state with proper error handling
+                if (updatedSweet && typeof updatedSweet === 'object' && updatedSweet.hasOwnProperty('quantity')) {
+                    setSweets(prev => prev.map(sweet =>
+                        sweet._id === id ? { ...sweet, quantity: updatedSweet.quantity } : sweet
+                    ));
+                    setAllSweets(prev => prev.map(sweet =>
+                        sweet._id === id ? { ...sweet, quantity: updatedSweet.quantity } : sweet
+                    ));
+                } else {
+                    // If response doesn't contain quantity, refetch all sweets to ensure consistency
+                    const refreshResponse = await fetch("/api/sweets");
+                    if (refreshResponse.ok) {
+                        const refreshedData = await refreshResponse.json();
+                        setSweets(refreshedData);
+                        setAllSweets(refreshedData);
+                    }
+                }
 
                 return;
             }
@@ -761,7 +775,7 @@ const AdminPage = () => {
                                             <input
                                                 type="number"
                                                 min="1"
-                                                defaultValue="10"
+                                                defaultValue="1"
                                                 id={`restock-${sweet._id}`}
                                                 style={styles.restockInput}
                                             />
@@ -769,7 +783,8 @@ const AdminPage = () => {
                                                 style={styles.restockBtn}
                                                 onClick={() => {
                                                     const input = document.getElementById(`restock-${sweet._id}`);
-                                                    handleRestockSweet(sweet._id, input.value);
+                                                    const quantity = parseInt(input.value) || 1;
+                                                    handleRestockSweet(sweet._id, quantity);
                                                 }}
                                             >
                                                 📦 Restock
