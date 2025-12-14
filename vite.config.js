@@ -10,6 +10,16 @@ export default defineConfig({
         target: 'https://incubyte-sweetshop-backend.onrender.com',
         changeOrigin: true,
         secure: true,
+      },
+      '/update': {
+        target: 'https://incubyte-sweetshop-backend.onrender.com',
+        changeOrigin: true,
+        secure: true,
+      },
+      '/delete': {
+        target: 'https://incubyte-sweetshop-backend.onrender.com',
+        changeOrigin: true,
+        secure: true,
       }
     }
   }

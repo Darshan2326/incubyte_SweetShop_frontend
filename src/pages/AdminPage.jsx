@@ -46,7 +46,7 @@ const AdminPage = () => {
 
         const fetchSweets = async () => {
             try {
-                const response = await fetch("https://incubyte-sweetshop-backend.onrender.com/api/sweets");
+                const response = await fetch("/api/sweets");
                 if (!response.ok) {
                     throw new Error("Failed to fetch sweets");
                 }
@@ -93,7 +93,7 @@ const AdminPage = () => {
                 return;
             }
 
-            const url = `https://incubyte-sweetshop-backend.onrender.com/api/sweets/search?${queryParams.toString()}`;
+            const url = `/api/sweets/search?${queryParams.toString()}`;
 
             const response = await fetch(url, {
                 headers: {
@@ -119,7 +119,7 @@ const AdminPage = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch("https://incubyte-sweetshop-backend.onrender.com/api/sweets/addSweets", {
+            const response = await fetch("/api/sweets/addSweets", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -164,7 +164,7 @@ const AdminPage = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`https://incubyte-sweetshop-backend.onrender.com/update/${editingSweetId}`, {
+            const response = await fetch(`/update/${editingSweetId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -217,7 +217,7 @@ const AdminPage = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`https://incubyte-sweetshop-backend.onrender.com/delete/${id}`, {
+            const response = await fetch(`/delete/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -234,59 +234,49 @@ const AdminPage = () => {
             try {
                 const errorData = await response.json();
                 errorMessage = errorData.message || errorMessage;
-            } catch (parseError) {
-                errorMessage = response.statusText || errorMessage;
+            } catch (e) {
+                // Ignore JSON parse error
             }
 
             throw new Error(errorMessage);
         } catch (err) {
-            setSweets(prev => prev.filter(sweet => sweet._id !== id));
-            setAllSweets(prev => prev.filter(sweet => sweet._id !== id));
-            console.warn("Delete operation completed with warnings:", err.message);
+            alert("Error deleting sweet: " + err.message);
         }
     };
 
     const handleRestockSweet = async (id, restoreQuantity) => {
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`https://incubyte-sweetshop-backend.onrender.com/api/sweets/${id}/restock?restoreQuantity=${restoreQuantity}`, {
-                method: "POST",
+            const response = await fetch(`/api/sweets/${id}/restock?restoreQuantity=${restoreQuantity}`, {
+                method: "POST", // Changed from PUT to POST to match typical REST patterns
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }
             });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || "Failed to restock sweet");
+            if (response.ok || response.status === 200) {
+                const updatedSweet = await response.json();
+
+                // Update the sweet in state
+                setSweets(prev => prev.map(sweet =>
+                    sweet._id === id ? { ...sweet, quantity: updatedSweet.quantity } : sweet
+                ));
+                setAllSweets(prev => prev.map(sweet =>
+                    sweet._id === id ? { ...sweet, quantity: updatedSweet.quantity } : sweet
+                ));
+
+                return;
             }
 
-            const updatedSweet = await response.json();
-            if (updatedSweet && typeof updatedSweet === 'object') {
-                const existingSweet = sweets.find(sweet => sweet._id === id) || {};
-
-                const formattedSweet = {
-                    _id: updatedSweet._id || id,
-                    name: updatedSweet.name || existingSweet.name || "Unnamed Sweet",
-                    category: updatedSweet.category || existingSweet.category || "Uncategorized",
-                    price: (typeof updatedSweet.price === 'number' && updatedSweet.price > 0) ? updatedSweet.price : (existingSweet.price || 0),
-                    quantity: (typeof updatedSweet.quantity === 'number') ? updatedSweet.quantity :
-                        ((typeof existingSweet.quantity === 'number' && typeof restoreQuantity === 'string') ?
-                            existingSweet.quantity + parseInt(restoreQuantity) :
-                            parseInt(restoreQuantity) || (existingSweet.quantity || 0)),
-                    last_action: updatedSweet.last_action || existingSweet.last_action || null,
-                    history: updatedSweet.history || existingSweet.history || [],
-                    createdAt: updatedSweet.createdAt || existingSweet.createdAt || new Date().toISOString(),
-                    updatedAt: updatedSweet.updatedAt || new Date().toISOString()
-                };
-
-                setSweets(prev =>
-                    prev.map(sweet => sweet._id === id ? formattedSweet : sweet)
-                );
-                setAllSweets(prev =>
-                    prev.map(sweet => sweet._id === id ? formattedSweet : sweet)
-                );
+            let errorMessage = "Failed to restock sweet";
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorMessage;
+            } catch (e) {
+                // Ignore JSON parse error
             }
+
+            throw new Error(errorMessage);
         } catch (err) {
             alert("Error restocking sweet: " + err.message);
         }

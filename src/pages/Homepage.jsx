@@ -49,7 +49,7 @@ const Homepage = () => {
 
         const fetchSweets = async () => {
             try {
-                const response = await fetch("https://incubyte-sweetshop-backend.onrender.com/api/sweets");
+                const response = await fetch("/api/sweets");
                 if (!response.ok) {
                     throw new Error("Failed to fetch sweets");
                 }
@@ -107,7 +107,7 @@ const Homepage = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`https://incubyte-sweetshop-backend.onrender.com/api/sweets/${sweetId}/purchese?quantity=${quantity}`, {
+            const response = await fetch(`/api/sweets/${sweetId}/purchese?quantity=${quantity}`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`
