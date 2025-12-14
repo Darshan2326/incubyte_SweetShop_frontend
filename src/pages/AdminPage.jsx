@@ -1469,6 +1469,9 @@ const styles = {
         cursor: "pointer",
         fontSize: "18px",
         transition: "all 0.3s ease",
+        color: "#000000",
+        alignItems: "center",
+        justifyContent: "center",
     },
     cardBody: {
         marginBottom: "20px",

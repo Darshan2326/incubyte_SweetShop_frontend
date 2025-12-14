@@ -23,7 +23,7 @@ in frontend i use react and i don't have enough experience in react i am flutter
 - i learn Vercel and Render deployement with Github and gain my CICD skill.
 - i learn the new errors that i didn't heread yet during the deployement.
 - i realise my abiloty and productivity by this assesment
--  
+
 
 
 
