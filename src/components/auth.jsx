@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { loginUser, registerUser } from "../API/auth";
+import { loginUser } from "../API/auth";
 
 const AuthPage = () => {
   const navigate = useNavigate();
   const { login, isAuthenticated, userRole } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
-    name: "",
     email: "",
     password: "",
   });
@@ -16,10 +14,8 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState("");
 
-  // Check if user is already logged in
   useEffect(() => {
     if (isAuthenticated && userRole) {
-      // Redirect based on user role
       if (userRole === "admin") {
         navigate("/admin");
       } else {
@@ -32,51 +28,27 @@ const AuthPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    // Reset form state
-    setIsLogin(true);
-    setForm({
-      name: "",
-      email: "",
-      password: "",
-    });
-    setMessage("");
-    // Force a re-render by updating state
-    setFocusedInput("");
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
     try {
-      let response;
-      if (isLogin) {
-        response = await loginUser({
-          email: form.email,
-          password: form.password,
-        });
-      } else {
-        response = await registerUser(form);
-      }
+      const response = await loginUser({
+        email: form.email,
+        password: form.password,
+      });
 
       setLoading(false);
 
       if (response.token) {
-        // Use the context login function which will update the auth state immediately
         login(response.token, response.user);
         setMessage(`✅ ${response.message}`);
 
-        // Redirect based on user role using React Router
-        if (isLogin) {
-          if (response.user.role === "admin") {
-            navigate("/admin");
-          } else {
-            navigate("/homepage");
-          }
+        if (response.user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/homepage");
         }
       } else {
         setMessage("❌ Something went wrong");
@@ -84,7 +56,6 @@ const AuthPage = () => {
     } catch (error) {
       setLoading(false);
       console.error("Authentication error:", error);
-      // Check if it's a CORS or network error
       if (error.name === 'TypeError' || error.message.includes('fetch') || error.message.includes('CORS')) {
         setMessage("❌ Network error. Please check your connection or try again later.");
       } else {
@@ -95,7 +66,6 @@ const AuthPage = () => {
 
   return (
     <div style={styles.container}>
-      {/* Floating Decorations */}
       <div style={styles.floatingCandy1}>🍭</div>
       <div style={styles.floatingCandy2}>🍩</div>
       <div style={styles.floatingCandy3}>🧁</div>
@@ -104,7 +74,6 @@ const AuthPage = () => {
       <div style={styles.floatingCandy6}>🍬</div>
 
       <div style={styles.mainCard}>
-        {/* Left Side - Branding */}
         <div style={styles.brandingSide}>
           <div style={styles.brandingContent}>
             <div style={styles.logoContainer}>
@@ -134,70 +103,14 @@ const AuthPage = () => {
           </div>
         </div>
 
-        {/* Right Side - Form */}
         <div style={styles.formSide}>
           <div style={styles.formContainer}>
-            <div style={styles.tabContainer}>
-              <button
-                style={{
-                  ...styles.tab,
-                  ...(isLogin ? styles.activeTab : {}),
-                }}
-                onClick={() => {
-                  setIsLogin(true);
-                  setMessage("");
-                }}
-              >
-                🔐 Login
-              </button>
-              <button
-                style={{
-                  ...styles.tab,
-                  ...(!isLogin ? styles.activeTab : {}),
-                }}
-                onClick={() => {
-                  setIsLogin(false);
-                  setMessage("");
-                }}
-              >
-                ✨ Register
-              </button>
-            </div>
-
-            <h2 style={styles.formTitle}>
-              {isLogin ? "Welcome Back! 👋" : "Join Our Sweet Family! 🎉"}
-            </h2>
+            <h2 style={styles.formTitle}>Welcome Back! 👋</h2>
             <p style={styles.formSubtitle}>
-              {isLogin
-                ? "Enter your credentials to access your account"
-                : "Create an account to get started"}
+              Enter your credentials to access the dashboard
             </p>
 
             <form onSubmit={handleSubmit} style={styles.form}>
-              {!isLogin && (
-                <div style={styles.inputGroup}>
-                  <label style={styles.inputLabel}>👤 Full Name</label>
-                  <div
-                    style={{
-                      ...styles.inputWrapper,
-                      ...(focusedInput === "name" ? styles.inputWrapperFocused : {}),
-                    }}
-                  >
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Enter your full name"
-                      required
-                      value={form.name}
-                      onChange={handleChange}
-                      onFocus={() => setFocusedInput("name")}
-                      onBlur={() => setFocusedInput("")}
-                      style={styles.input}
-                    />
-                  </div>
-                </div>
-              )}
-
               <div style={styles.inputGroup}>
                 <label style={styles.inputLabel}>📧 Email Address</label>
                 <div
@@ -242,10 +155,6 @@ const AuthPage = () => {
                 </div>
               </div>
 
-              {isLogin && (
-                <p style={styles.forgotPassword}>Forgot Password?</p>
-              )}
-
               <button
                 type="submit"
                 disabled={loading}
@@ -259,13 +168,17 @@ const AuthPage = () => {
                     <span style={styles.spinner}></span>
                     Please wait...
                   </span>
-                ) : isLogin ? (
-                  "🚀 Login to Dashboard"
                 ) : (
-                  "🎂 Create Account"
+                  "🚀 Login to Dashboard"
                 )}
               </button>
             </form>
+
+            <div style={styles.demoCredentials}>
+              <p style={styles.demoTitle}>🔑 Demo Credentials</p>
+              <p style={styles.demoText}><strong>Admin:</strong> admin@demo.com / admin123</p>
+              <p style={styles.demoText}><strong>User:</strong> user@demo.com / user123</p>
+            </div>
 
             {message && (
               <div
@@ -279,26 +192,10 @@ const AuthPage = () => {
                 {message}
               </div>
             )}
-
-            <div style={styles.footer}>
-              <p style={styles.footerText}>
-                {isLogin ? "New to Sweet Delights?" : "Already have an account?"}
-                <span
-                  style={styles.footerLink}
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    setMessage("");
-                  }}
-                >
-                  {isLogin ? " Create Account" : " Sign In"}
-                </span>
-              </p>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Add CSS Animation Keyframes */}
       <style>
         {`
           @keyframes float {
@@ -331,9 +228,7 @@ const styles = {
   container: {
     minHeight: "100vh",
     width: "100vw",
-    // display: "flex",
     flexDirection: "column",
-    // alignItems: "center",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -343,7 +238,6 @@ const styles = {
     overflow: "hidden",
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
-  // Floating candies
   floatingCandy1: {
     position: "absolute",
     top: "10%",
@@ -404,7 +298,6 @@ const styles = {
     position: "relative",
     zIndex: 10,
   },
-  // Branding Side
   brandingSide: {
     flex: "1",
     background: "linear-gradient(135deg, #ff6b9d 0%, #c44569 50%, #b8405e 100%)",
@@ -492,7 +385,6 @@ const styles = {
   wavePath: {
     fill: "rgba(255, 255, 255, 0.1)",
   },
-  // Form Side
   formSide: {
     flex: "1.2",
     display: "flex",
@@ -505,31 +397,6 @@ const styles = {
     maxWidth: "380px",
     margin: "0 auto",
     width: "100%",
-  },
-  tabContainer: {
-    display: "flex",
-    gap: "10px",
-    marginBottom: "30px",
-    background: "#f8f0f0",
-    padding: "6px",
-    borderRadius: "15px",
-  },
-  tab: {
-    flex: "1",
-    padding: "12px 20px",
-    border: "none",
-    background: "transparent",
-    borderRadius: "12px",
-    cursor: "pointer",
-    fontSize: "14px",
-    fontWeight: "600",
-    color: "#888",
-    transition: "all 0.3s ease",
-  },
-  activeTab: {
-    background: "linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)",
-    color: "#fff",
-    boxShadow: "0 5px 20px rgba(196, 69, 105, 0.3)",
   },
   formTitle: {
     fontSize: "26px",
@@ -580,14 +447,6 @@ const styles = {
     outline: "none",
     boxSizing: "border-box",
   },
-  forgotPassword: {
-    fontSize: "13px",
-    color: "#c44569",
-    textAlign: "right",
-    cursor: "pointer",
-    fontWeight: "500",
-    marginTop: "-10px",
-  },
   submitButton: {
     padding: "16px 30px",
     border: "none",
@@ -622,6 +481,25 @@ const styles = {
     animation: "spin 1s linear infinite",
     display: "inline-block",
   },
+  demoCredentials: {
+    marginTop: "25px",
+    padding: "15px 20px",
+    background: "linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)",
+    borderRadius: "12px",
+    border: "1px solid #ffeaa7",
+  },
+  demoTitle: {
+    fontSize: "13px",
+    fontWeight: "700",
+    color: "#856404",
+    marginBottom: "8px",
+  },
+  demoText: {
+    fontSize: "12px",
+    color: "#856404",
+    margin: "4px 0",
+    lineHeight: "1.5",
+  },
   messageBox: {
     marginTop: "20px",
     padding: "15px 20px",
@@ -639,22 +517,6 @@ const styles = {
     background: "linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)",
     color: "#721c24",
     border: "1px solid #f5c6cb",
-  },
-  footer: {
-    marginTop: "30px",
-    textAlign: "center",
-    paddingTop: "20px",
-    borderTop: "1px dashed #eee",
-  },
-  footerText: {
-    fontSize: "14px",
-    color: "#888",
-  },
-  footerLink: {
-    color: "#c44569",
-    fontWeight: "700",
-    cursor: "pointer",
-    transition: "color 0.3s ease",
   },
 };
 
